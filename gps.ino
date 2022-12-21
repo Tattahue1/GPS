@@ -29,6 +29,8 @@ void setup()
 //call(); 
 delay(8000);
 //sms();   
+
+  sim.println("AT+CNMI=1,2,0,0,0");
 }
 void loop()
 {
@@ -48,21 +50,30 @@ void loop()
   if (newData)
   {
     gps.f_get_position(&latitud, &longitud);
-    Serial.print("LAT=");
-    Serial.print(latitud == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : latitud, 6);
-    Serial.print(" LON=");
-    Serial.print(longitud == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : longitud, 6);
-    Serial.print(" SAT=");
-    Serial.println(sat = gps.satellites() == TinyGPS::GPS_INVALID_SATELLITES ? 0 : gps.satellites());
+//    Serial.print("LAT=");
+//    Serial.print(latitud == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : latitud, 6);
+//    Serial.print(" LON=");
+//    Serial.print(longitud == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : longitud, 6);
+//    Serial.print(" SAT=");
+//    Serial.println(sat = gps.satellites() == TinyGPS::GPS_INVALID_SATELLITES ? 0 : gps.satellites());
 
   char buffer[10]= " ";
   String lati = dtostrf(latitud,7,5,buffer);
   String longi = dtostrf(longitud,7,5,buffer);
   String SMS = lati + ", " + longi;
-  Serial.print(SMS);
+  Serial.println(SMS);
   }
   sim.begin(115200);
-  sms();
+    while(sim.read() == -1)
+    {
+      Serial.println(sim.read());
+      if(sim.read() != -1)
+      {
+        sms();
+        break;
+      }
+    }
+//  sms();
 //  call();
   ss.begin(9600);
   delay(10000); 
